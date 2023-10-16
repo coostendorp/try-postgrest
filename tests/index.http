@@ -1,0 +1,13 @@
+
+###
+GET http://localhost:3000
+Accept: application/json
+Authorization: Bearer {{admin_user_token}}
+
+> {%
+    client.test("Content-Type is application/json", () => {
+        const contentType = response.headers.valueOf("content-type");
+        client.assert(contentType == "application/json",
+            `Expected Content-Type is application/json, but actual is ${contentType}`)
+    })
+%}
