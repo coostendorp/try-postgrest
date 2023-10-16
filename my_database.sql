@@ -1,11 +1,12 @@
 -- Setup authenticator
 CREATE ROLE postgrest WITH LOGIN PASSWORD 'postgrest';
-CREATE ROLE authenticator NOLOGIN;
+create role authenticator noinherit login password 'mysecretpassword';
 GRANT authenticator TO postgrest;
 
--- Setup web_anon
+-- Setup guest
 CREATE ROLE guest NOLOGIN;
 GRANT guest TO authenticator;
+GRANT USAGE ON SCHEMA public TO guest;
 
 -- Setup normal_user
 CREATE ROLE normal_user NOLOGIN;
@@ -17,6 +18,8 @@ CREATE ROLE admin_user NOLOGIN;
 GRANT admin_user TO authenticator;
 GRANT USAGE ON SCHEMA public TO admin_user;
 
+
+-- Account table: Definition
 CREATE TYPE account_role AS ENUM ('admin_user', 'normal_user', 'guest');
 
 CREATE TABLE account
@@ -30,6 +33,8 @@ CREATE TABLE account
 
 ALTER TABLE account
     ENABLE ROW LEVEL SECURITY;
+
+-- Account table: Security
 
 CREATE POLICY normal_user_account_select_own ON account
     FOR SELECT
@@ -46,6 +51,7 @@ GRANT SELECT (id, email), UPDATE (email) ON account TO normal_user;
 
 GRANT SELECT, INSERT, DELETE ON account TO admin_user;
 
+-- todos table: Definition
 
 CREATE TABLE todo
 (
@@ -58,13 +64,24 @@ CREATE TABLE todo
 ALTER TABLE todo
     ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY guest_todo_select ON todo
+    FOR SELECT
+    USING (true);
+
 CREATE POLICY normal_user_todo_select_own ON todo
     FOR ALL
     TO normal_user
     USING (id = (CURRENT_SETTING('request.jwt.claims', TRUE)::json ->> 'sub')::integer);
 
-
 GRANT ALL ON todo TO admin_user;
+GRANT ALL ON todo TO guest;
+
+
+ALTER TABLE todo
+    FORCE ROW LEVEL SECURITY;
+
+-- todos table: Security
+
 
 --
 -- grant all on public.users to todo_user;
