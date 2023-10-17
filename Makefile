@@ -15,5 +15,8 @@ create-env:
 restart-server:
 	docker compose down -v && docker compose up -d
 
+stop:
+	docker compose down -v
+
 populate-db: restart-server wait-for-postgres
 	cat my_database.sql | docker-compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB
