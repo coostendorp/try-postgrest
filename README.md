@@ -11,7 +11,7 @@
 
 # Getting started
 
-- Create the .env: `make create-env`
+- Create the .env: `cp .env.example .env`
 - Start the servers: `make restart-server`
 - Install the sql from _my_database.sql_: `make populate-db`
 - View the REST API at: http://localhost:3000/
