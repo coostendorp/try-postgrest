@@ -1,4 +1,5 @@
-SHELL := /bin/bash
+SHELL := /bin/bash -i
+export BASH_ENV := ~/.bashrc
 
 include .env
 export
@@ -17,3 +18,9 @@ stop-server:
 
 populate-db: restart-server wait-for-postgres
 	cat my_database.sql | docker compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB
+
+install-bruno:
+	npm install -g @usebruno/cli
+
+run-bruno-tests:
+	cd bruno && bru run --env local

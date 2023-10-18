@@ -1,7 +1,0 @@
-
-POST http://localhost:3000/todos
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{"task": "learn how to auth"}
-
